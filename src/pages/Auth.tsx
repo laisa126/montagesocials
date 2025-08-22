@@ -1,84 +1,128 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { User, Session } from '@supabase/supabase-js';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { useState } from "react"
+import { supabase } from "@/lib/supabase"
+import { useNavigate } from "react-router-dom"
+import clsx from "clsx"
+import { FiMail, FiLock, FiUser } from "react-icons/fi"
+import { toast } from "@/components/ui/sonner"
 
-const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    username: '',
-    fullName: ''
-  });
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
-  
-  const navigate = useNavigate();
+export default function Auth() {
+  const [mode, setMode] = useState<"login"|"signup">("login")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [shake, setShake] = useState(false)
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Redirect authenticated users to home
-        if (session?.user) {
-          navigate('/');
-        }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        navigate('/');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleAuth = async () => {
+    setShake(false)
+    setLoading(true)
     try {
-      if (isForgotPassword) {
-        const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-          redirectTo: `${window.location.origin}/auth`,
-        });
-
-        if (error) {
-          toast.error(error.message);
-        } else {
-          toast.success('Password reset email sent! Check your inbox.');
-          setIsForgotPassword(false);
-        }
-      } else if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
-        });
-
-        if (error) {
-          toast.error(error.message);
-        } else {
-          toast.success('Welcome back!');
-        }
+      if (mode === "signup") {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password })
+        if (signUpError) throw signUpError
+        await supabase.from("profiles").insert({ id: signUpData.user?.id, username })
+        toast.success("Account created!")
       } else {
+        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+        if (loginError) throw loginError
+        toast.success("Logged in!")
+      }
+      navigate("/") // redirect to Home/Feed
+    } catch (err: any) {
+      setShake(true)
+      toast.error(err.message || "Invalid credentials")
+      setTimeout(() => setShake(false), 500)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReset = async () => {
+    if (!email) return toast.error("Enter your email first")
+    const { error } = await supabase.auth.resetPasswordForEmail(email)
+    if (error) toast.error(error.message)
+    else toast.success("Check your email for password reset link")
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-pink-50 via-purple-50 to-white p-4">
+      {/* Floating gradient logo */}
+      <div className="mb-10">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-500 to-purple-500 flex items-center justify-center text-white text-3xl font-extrabold shadow-lg">
+          M
+        </div>
+      </div>
+
+      {/* Auth card */}
+      <div className={clsx(
+        "bg-white rounded-3xl shadow-xl w-full max-w-sm p-6 space-y-6 transition-transform",
+        shake && "animate-shake"
+      )}>
+        <h1 className="text-3xl font-extrabold text-center">{mode === "login" ? "Log In" : "Sign Up"}</h1>
+
+        <div className="space-y-4">
+          <div className="relative">
+            <FiMail className="absolute top-3 left-3 text-gray-400"/>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={e=>setEmail(e.target.value)}
+              className="w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-pink-400 outline-none transition"
+            />
+          </div>
+
+          <div className="relative">
+            <FiLock className="absolute top-3 left-3 text-gray-400"/>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={e=>setPassword(e.target.value)}
+              className="w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-pink-400 outline-none transition"
+            />
+          </div>
+
+          {mode === "signup" && (
+            <div className="relative">
+              <FiUser className="absolute top-3 left-3 text-gray-400"/>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={e=>setUsername(e.target.value)}
+                className="w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-pink-400 outline-none transition"
+              />
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={handleAuth}
+          disabled={loading}
+          className={clsx(
+            "w-full py-3 rounded-2xl font-bold text-white text-lg bg-gradient-to-r from-pink-500 to-purple-500",
+            "hover:from-pink-600 hover:to-purple-600 transition",
+            loading && "opacity-50"
+          )}
+        >
+          {loading ? "Loading..." : mode === "login" ? "Log In" : "Sign Up"}
+        </button>
+
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          <button className="underline" onClick={handleReset}>Forgot password?</button>
+          <button
+            className="font-semibold text-pink-500 underline"
+            onClick={() => setMode(mode === "login" ? "signup" : "login")}
+          >
+            {mode === "login" ? "Sign Up" : "Log In"}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+    }      } else {
         const { error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
