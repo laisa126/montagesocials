@@ -93,26 +93,26 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-muted p-4">
-      {/* Instagram-style logo */}
-      <div className="mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black p-4">
+      {/* Threads-style logo with Montage branding */}
+      <div className="mb-12">
+        <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-black text-3xl font-bold shadow-2xl">
           M
         </div>
       </div>
 
-      {/* Auth card */}
+      {/* Auth card with Threads-style design */}
       <div
         className={clsx(
-          "bg-card rounded-2xl border border-border w-full max-w-sm p-8 space-y-6 transition-transform shadow-lg",
+          "bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-sm p-8 space-y-6 transition-transform",
           shake && "animate-shake"
         )}
       >
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl font-bold text-white mb-2">
             {mode === "login" ? "Log in" : "Sign up"}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-zinc-400">
             {mode === "login" ? "Welcome back to Montage" : "Join the conversation"}
           </p>
         </div>
@@ -121,35 +121,35 @@ export default function Auth() {
           {/* Username or Email for login, separate fields for signup */}
           {mode === "login" ? (
             <div className="relative">
-              <FiAtSign className="absolute top-3.5 left-3 text-muted-foreground w-4 h-4" />
+              <FiAtSign className="absolute top-3.5 left-3 text-zinc-400 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Email or username"
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}
-                className="w-full pl-10 pr-3 py-3 border border-border bg-background rounded-lg focus:ring-1 focus:ring-ring focus:border-ring outline-none transition text-foreground placeholder-muted-foreground"
+                className="w-full pl-10 pr-3 py-3 border border-zinc-700 bg-zinc-800 rounded-lg focus:ring-1 focus:ring-white focus:border-white outline-none transition text-white placeholder-zinc-400"
               />
             </div>
           ) : (
             <>
               <div className="relative">
-                <FiUser className="absolute top-3.5 left-3 text-muted-foreground w-4 h-4" />
+                <FiUser className="absolute top-3.5 left-3 text-zinc-400 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-border bg-background rounded-lg focus:ring-1 focus:ring-ring focus:border-ring outline-none transition text-foreground placeholder-muted-foreground"
+                  className="w-full pl-10 pr-3 py-3 border border-zinc-700 bg-zinc-800 rounded-lg focus:ring-1 focus:ring-white focus:border-white outline-none transition text-white placeholder-zinc-400"
                 />
               </div>
               <div className="relative">
-                <FiAtSign className="absolute top-3.5 left-3 text-muted-foreground w-4 h-4" />
+                <FiAtSign className="absolute top-3.5 left-3 text-zinc-400 w-4 h-4" />
                 <input
                   type="email"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-border bg-background rounded-lg focus:ring-1 focus:ring-ring focus:border-ring outline-none transition text-foreground placeholder-muted-foreground"
+                  className="w-full pl-10 pr-3 py-3 border border-zinc-700 bg-zinc-800 rounded-lg focus:ring-1 focus:ring-white focus:border-white outline-none transition text-white placeholder-zinc-400"
                 />
               </div>
             </>
@@ -157,24 +157,24 @@ export default function Auth() {
 
           {/* Password */}
           <div className="relative">
-            <FiLock className="absolute top-3.5 left-3 text-muted-foreground w-4 h-4" />
+            <FiLock className="absolute top-3.5 left-3 text-zinc-400 w-4 h-4" />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-3 py-3 border border-border bg-background rounded-lg focus:ring-1 focus:ring-ring focus:border-ring outline-none transition text-foreground placeholder-muted-foreground"
+              className="w-full pl-10 pr-3 py-3 border border-zinc-700 bg-zinc-800 rounded-lg focus:ring-1 focus:ring-white focus:border-white outline-none transition text-white placeholder-zinc-400"
             />
           </div>
         </div>
 
-        {/* Submit button */}
+        {/* Submit button with Montage gradient */}
         <button
           onClick={handleAuth}
           disabled={loading}
           className={clsx(
-            "w-full py-3 rounded-lg font-semibold text-primary-foreground text-sm bg-gradient-to-r from-primary to-secondary",
-            "hover:opacity-90 transition-all shadow-lg",
+            "w-full py-3 rounded-lg font-semibold text-black text-sm bg-white",
+            "hover:bg-zinc-200 transition-all",
             loading && "opacity-50 cursor-not-allowed"
           )}
         >
@@ -185,7 +185,7 @@ export default function Auth() {
         {mode === "login" && (
           <div className="text-center">
             <button 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors" 
+              className="text-sm text-zinc-400 hover:text-white transition-colors" 
               onClick={handleReset}
             >
               Forgot password?
@@ -194,12 +194,12 @@ export default function Auth() {
         )}
 
         {/* Switch mode */}
-        <div className="text-center pt-4 border-t border-border">
-          <span className="text-sm text-muted-foreground">
+        <div className="text-center pt-4 border-t border-zinc-700">
+          <span className="text-sm text-zinc-400">
             {mode === "login" ? "Don't have an account? " : "Already have an account? "}
           </span>
           <button
-            className="text-sm font-semibold text-primary hover:underline"
+            className="text-sm font-semibold text-white hover:underline"
             onClick={() => {
               setMode(mode === "login" ? "signup" : "login")
               setEmailOrUsername("")
