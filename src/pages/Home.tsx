@@ -113,38 +113,40 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between px-4 h-14">
-          <div className="flex items-center gap-2">
-            <img src="/src/assets/montage-icon.png" alt="Montage" className="w-6 h-6" />
-            <h1 className="text-2xl font-bold text-foreground font-inter tracking-tight">
-              Cytol
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground text-sm font-bold">M</span>
+            </div>
+            <h1 className="text-xl font-semibold text-foreground">
+              Montage
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate("/create")}
-              className="text-foreground hover:text-primary h-8 w-8"
+              className="text-foreground hover:bg-muted h-10 w-10"
             >
-              <Plus size={24} strokeWidth={2} />
+              <Plus size={22} strokeWidth={2} />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate("/messages")}
-              className="text-foreground hover:text-primary h-8 w-8"
+              className="text-foreground hover:bg-muted h-10 w-10"
             >
-              <Send size={24} strokeWidth={2} />
+              <Send size={22} strokeWidth={2} />
             </Button>
           </div>
         </div>
       </header>
 
       {/* Stories Row */}
-      <div className="border-b border-border py-4">
-        <div className="flex items-center gap-3 px-4 overflow-x-auto scrollbar-hide">
+      <div className="border-b border-border py-3">
+        <div className="flex items-center gap-4 px-4 overflow-x-auto scrollbar-hide">
           {/* Your Story */}
           <button 
             className="flex flex-col items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity"
@@ -152,8 +154,8 @@ const Home = () => {
           >
             <div className="relative">
               {userStories.length > 0 ? (
-                <div className="p-0.5 bg-gradient-story rounded-2xl">
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden ring-2 ring-background">
+                <div className="p-0.5 bg-primary rounded-full">
+                  <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-background">
                     <img 
                       src={profile.avatar_url || '/placeholder.svg'} 
                       alt={profile.full_name || 'Your story'}
@@ -163,20 +165,20 @@ const Home = () => {
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden ring-2 ring-muted bg-muted">
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-muted border border-border">
                     <img 
                       src={profile.avatar_url || '/placeholder.svg'} 
                       alt={profile.full_name || 'Your story'}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-background">
-                    <Plus size={14} className="text-primary-foreground" strokeWidth={2.5} />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                    <Plus size={12} className="text-primary-foreground" strokeWidth={2.5} />
                   </div>
                 </div>
               )}
             </div>
-            <span className="text-xs text-foreground font-medium max-w-[4.5rem] truncate font-inter">
+            <span className="text-xs text-muted-foreground font-medium max-w-[3.5rem] truncate">
               {userStories.length > 0 ? profile.username : "Your story"}
             </span>
           </button>
@@ -195,8 +197,8 @@ const Home = () => {
                   className="flex flex-col items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity"
                   onClick={() => navigate(`/story/${userProfile.user_id}/0`)}
                 >
-                  <div className="p-0.5 bg-gradient-story rounded-2xl">
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden ring-2 ring-background">
+                  <div className="p-0.5 bg-primary rounded-full">
+                    <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-background">
                       <img 
                         src={userProfile.avatar_url || '/placeholder.svg'} 
                         alt={userProfile.full_name || userProfile.username}
@@ -204,7 +206,7 @@ const Home = () => {
                       />
                     </div>
                   </div>
-                  <span className="text-xs text-foreground font-medium truncate max-w-[4.5rem] font-inter">
+                  <span className="text-xs text-muted-foreground font-medium truncate max-w-[3.5rem]">
                     {userProfile.username}
                   </span>
                 </button>
@@ -218,16 +220,16 @@ const Home = () => {
       <div className="pb-20">
         {posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4">
-            <div className="w-24 h-24 bg-gradient-primary rounded-full flex items-center justify-center mb-6 shadow-glow">
-              <Plus size={32} className="text-primary-foreground" />
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
+              <Plus size={28} className="text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold text-foreground mb-2">Welcome to Montage!</h2>
-            <p className="text-muted-foreground text-center mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-2">Welcome to Montage!</h2>
+            <p className="text-muted-foreground text-center mb-6 text-sm">
               Start sharing your moments. Create your first post to get started.
             </p>
             <Button 
               onClick={() => navigate("/create")}
-              className="bg-gradient-primary text-primary-foreground px-8 py-3 rounded-full font-medium shadow-glow hover:shadow-lg transition-all duration-300"
+              className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
             >
               Create Your First Post
             </Button>
@@ -249,18 +251,18 @@ const Home = () => {
                       className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                       onClick={() => navigate(`/user/${postProfile.user_id}`)}
                     >
-                      <Avatar className="w-10 h-10">
+                      <Avatar className="w-8 h-8">
                         <AvatarImage src={postProfile.avatar_url} />
-                        <AvatarFallback className="bg-gradient-primary text-primary-foreground font-semibold text-sm">
+                        <AvatarFallback className="bg-muted text-foreground font-medium text-xs">
                           {(postProfile.full_name || postProfile.username).charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-left">
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold text-foreground text-sm">{postProfile.username}</p>
+                          <p className="font-medium text-foreground text-sm">{postProfile.username}</p>
                           {postProfile.is_verified && (
-                            <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                              <span className="text-primary-foreground text-xs">✓</span>
+                            <div className="w-3 h-3 bg-primary rounded-full flex items-center justify-center">
+                              <span className="text-primary-foreground text-[10px]">✓</span>
                             </div>
                           )}
                         </div>
@@ -286,53 +288,53 @@ const Home = () => {
 
                   {/* Post Actions */}
                   <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-4">
                         <Button 
                           variant="ghost" 
                           size="icon" 
                           onClick={() => handleLike(post.id)}
-                          className={`h-8 w-8 ${
+                          className={`h-8 w-8 hover:bg-transparent ${
                             isLiked
                               ? 'text-red-500' 
                               : 'text-foreground hover:text-red-500'
                           }`}
                         >
-                          <Heart size={24} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={1.5} />
+                          <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={1.5} />
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-8 w-8 text-foreground hover:text-primary"
+                          className="h-8 w-8 text-foreground hover:text-foreground hover:bg-transparent"
                           onClick={() => navigate(`/post/${post.id}`)}
                         >
-                          <MessageCircle size={24} strokeWidth={1.5} />
+                          <MessageCircle size={20} strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:text-primary">
-                          <Send size={24} strokeWidth={1.5} />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:text-foreground hover:bg-transparent">
+                          <Send size={20} strokeWidth={1.5} />
                         </Button>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:text-primary">
-                        <Bookmark size={24} strokeWidth={1.5} />
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:text-foreground hover:bg-transparent">
+                        <Bookmark size={20} strokeWidth={1.5} />
                       </Button>
                     </div>
 
                     {/* Likes */}
                     {likesCount > 0 && (
-                      <p className="font-semibold text-sm text-foreground mb-2">
+                      <p className="font-medium text-sm text-foreground mb-1">
                         {likesCount} {likesCount === 1 ? 'like' : 'likes'}
                       </p>
                     )}
 
                     {/* Post Content */}
-                    <div className="text-sm text-foreground">
-                      <span className="font-semibold">{postProfile.username}</span> {post.content}
+                    <div className="text-sm text-foreground mb-1">
+                      <span className="font-medium">{postProfile.username}</span> {post.content}
                     </div>
 
                     {/* Comments */}
                     {post.comments && post.comments.length > 0 && (
                       <button 
-                        className="text-sm text-muted-foreground mt-2 hover:opacity-80 transition-opacity"
+                        className="text-sm text-muted-foreground hover:opacity-80 transition-opacity"
                         onClick={() => navigate(`/post/${post.id}`)}
                       >
                         View all {post.comments.length} comments

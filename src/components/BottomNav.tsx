@@ -40,17 +40,17 @@ const BottomNav = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md border-t border-border z-50">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
+      <div className="flex items-center justify-around h-14 px-2">
         {navItems.map((item) => (
           <Button
             key={item.path}
             variant="ghost"
             size="icon"
             onClick={() => navigate(item.path)}
-            className={`h-12 w-12 rounded-lg transition-colors ${
+            className={`h-10 w-10 rounded-none transition-colors ${
               isActive(item.path) 
-                ? "text-primary" 
+                ? "text-foreground" 
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -59,7 +59,7 @@ const BottomNav = () => {
                 <DropdownMenuTrigger asChild>
                   <Avatar className="w-6 h-6 cursor-pointer">
                     <AvatarImage src={profile?.avatar_url} />
-                    <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs font-semibold">
+                    <AvatarFallback className="bg-muted text-foreground text-xs font-medium">
                       {(profile?.full_name || profile?.username || 'U').charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -76,7 +76,7 @@ const BottomNav = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <item.icon size={24} />
+              <item.icon size={22} strokeWidth={1.5} />
             )}
           </Button>
         ))}

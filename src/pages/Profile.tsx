@@ -122,26 +122,26 @@ const Profile = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 h-14">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate(-1)}
-              className="text-foreground hover:text-primary h-8 w-8"
+              className="text-foreground hover:bg-muted h-9 w-9"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </Button>
-            <h1 className="text-lg font-semibold text-foreground">@{profile.username}</h1>
+            <h1 className="text-lg font-medium text-foreground">@{profile.username}</h1>
           </div>
           <Button 
             variant="ghost" 
             size="icon"
             onClick={() => navigate("/settings")}
-            className="text-foreground hover:text-primary h-8 w-8"
+            className="text-foreground hover:bg-muted h-9 w-9"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="1" fill="currentColor"/>
               <circle cx="19" cy="12" r="1" fill="currentColor"/>
               <circle cx="5" cy="12" r="1" fill="currentColor"/>
@@ -152,42 +152,42 @@ const Profile = () => {
 
       <div className="space-y-6">
         {/* Profile Info */}
-        <div className="px-4 py-4">
-          <div className="flex items-center gap-6 mb-4">
+        <div className="px-4 py-6">
+          <div className="flex items-center gap-6 mb-6">
             <Avatar className="w-20 h-20">
               <AvatarImage src={profile.avatar_url || undefined} />
-              <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xl font-bold">
+              <AvatarFallback className="bg-muted text-foreground text-xl font-medium">
                 {profile.full_name?.charAt(0).toUpperCase() || profile.username.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 flex justify-around text-center">
               <div>
-                <p className="text-lg font-bold text-foreground">{userPosts.length}</p>
+                <p className="text-xl font-medium text-foreground">{userPosts.length}</p>
                 <p className="text-sm text-muted-foreground">Posts</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-foreground">0</p>
+                <p className="text-xl font-medium text-foreground">0</p>
                 <p className="text-sm text-muted-foreground">Followers</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-foreground">0</p>
+                <p className="text-xl font-medium text-foreground">0</p>
                 <p className="text-sm text-muted-foreground">Following</p>
               </div>
             </div>
           </div>
 
           <div className="mb-4">
-            <h2 className="text-sm font-bold text-foreground">{profile.full_name || profile.username}</h2>
+            <h2 className="text-sm font-medium text-foreground">{profile.full_name || profile.username}</h2>
             {profile.bio && (
-              <p className="text-sm text-foreground">{profile.bio}</p>
+              <p className="text-sm text-foreground mt-1">{profile.bio}</p>
             )}
           </div>
 
 
           <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="w-full rounded-lg">
+              <Button variant="outline" className="w-full rounded-md border-border">
                 <Edit size={16} className="mr-2" />
                 Edit Profile
               </Button>
@@ -200,7 +200,7 @@ const Profile = () => {
                   <div className="flex flex-col items-center gap-4">
                     <Avatar className="w-20 h-20">
                       <AvatarImage src={editForm.avatar_url || undefined} />
-                      <AvatarFallback className="bg-gradient-primary text-primary-foreground text-lg font-bold">
+                      <AvatarFallback className="bg-muted text-foreground text-lg font-medium">
                         {editForm.full_name?.charAt(0).toUpperCase() || editForm.username.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -245,13 +245,12 @@ const Profile = () => {
                     >
                       Cancel
                     </Button>
-                    <GradientButton
-                      variant="primary"
+                    <Button
                       onClick={handleSaveProfile}
-                      className="flex-1"
+                      className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       Save
-                    </GradientButton>
+                    </Button>
                   </div>
                 </div>
               </DialogContent>
@@ -274,20 +273,20 @@ const Profile = () => {
 
           <TabsContent value="posts" className="mt-6">
             {userPosts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mb-4 shadow-glow">
-                  <Plus size={28} className="text-primary-foreground" />
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <Plus size={24} className="text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Share your first post</h3>
-                <p className="text-muted-foreground text-center mb-6">
+                <h3 className="text-lg font-medium text-foreground mb-2">Share your first post</h3>
+                <p className="text-muted-foreground text-center mb-6 text-sm">
                   When you share photos and videos, they'll appear on your profile.
                 </p>
-                <GradientButton
-                  variant="primary"
+                <Button
                   onClick={() => navigate("/create")}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Create Post
-                </GradientButton>
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-0.5 px-4">

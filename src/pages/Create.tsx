@@ -79,42 +79,42 @@ const Create = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="flex items-center justify-between px-4 h-16">
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
+        <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate(-1)}
-              className="text-foreground hover:text-primary"
+              className="text-foreground hover:bg-muted h-9 w-9"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={20} />
             </Button>
-            <h1 className="text-lg font-semibold text-foreground">New Post</h1>
+            <h1 className="text-lg font-medium text-foreground">New Post</h1>
           </div>
-          <GradientButton
-            variant="primary"
+          <Button
             size="sm"
             onClick={handlePost}
             disabled={isPosting}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-4"
           >
             {isPosting ? "Posting..." : "Share"}
-          </GradientButton>
+          </Button>
         </div>
       </header>
 
       <div className="p-4 space-y-6">
         {/* User Info */}
         <div className="flex items-center gap-3">
-          <Avatar className="w-12 h-12">
+          <Avatar className="w-10 h-10">
             <AvatarImage src={currentUser.user_metadata?.avatar_url} />
-            <AvatarFallback className="bg-gradient-primary text-primary-foreground font-semibold">
+            <AvatarFallback className="bg-muted text-foreground font-medium text-sm">
               {(currentUser.user_metadata?.full_name || currentUser.email)?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-foreground">{currentUser.user_metadata?.username || currentUser.email?.split('@')[0]}</p>
-            <p className="text-sm text-muted-foreground">{currentUser.user_metadata?.full_name || currentUser.email}</p>
+            <p className="font-medium text-foreground text-sm">{currentUser.user_metadata?.username || currentUser.email?.split('@')[0]}</p>
+            <p className="text-xs text-muted-foreground">{currentUser.user_metadata?.full_name || currentUser.email}</p>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ const Create = () => {
         </div>
 
         {/* Image Upload */}
-        <Card className="border-dashed border-2 border-border hover:border-primary/50 transition-colors">
+        <Card className="border border-border">
           <CardContent className="p-6">
             <label className="flex flex-col items-center justify-center cursor-pointer">
               <input
@@ -145,10 +145,10 @@ const Create = () => {
                 onChange={handleImageUpload}
                 className="hidden"
               />
-              <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mb-4 shadow-glow">
-                <Camera size={24} className="text-primary-foreground" />
+              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
+                <Camera size={20} className="text-muted-foreground" />
               </div>
-              <h3 className="font-semibold text-foreground mb-2">Add Photos</h3>
+              <h3 className="font-medium text-foreground mb-1">Add Photos</h3>
               <p className="text-sm text-muted-foreground text-center">
                 Upload up to 10 images to share with your post
               </p>
