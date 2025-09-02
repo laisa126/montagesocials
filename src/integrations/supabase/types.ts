@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      close_friends: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -114,6 +135,93 @@ export type Database = {
         }
         Relationships: []
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hashtags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          post_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          post_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          post_count?: number | null
+        }
+        Relationships: []
+      }
+      likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -188,6 +296,27 @@ export type Database = {
         }
         Relationships: []
       }
+      post_hashtags: {
+        Row: {
+          created_at: string
+          hashtag_id: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashtag_id: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          hashtag_id?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -219,28 +348,37 @@ export type Database = {
       }
       posts: {
         Row: {
+          aspect_ratio: string | null
           content: string
           created_at: string
           id: string
           images: string[] | null
+          is_reel: boolean | null
           updated_at: string
           user_id: string
+          video_url: string | null
         }
         Insert: {
+          aspect_ratio?: string | null
           content: string
           created_at?: string
           id?: string
           images?: string[] | null
+          is_reel?: boolean | null
           updated_at?: string
           user_id: string
+          video_url?: string | null
         }
         Update: {
+          aspect_ratio?: string | null
           content?: string
           created_at?: string
           id?: string
           images?: string[] | null
+          is_reel?: boolean | null
           updated_at?: string
           user_id?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -286,8 +424,30 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_posts: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stories: {
         Row: {
+          close_friends_only: boolean | null
           content: string | null
           created_at: string
           expires_at: string
@@ -299,6 +459,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          close_friends_only?: boolean | null
           content?: string | null
           created_at?: string
           expires_at?: string
@@ -310,6 +471,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          close_friends_only?: boolean | null
           content?: string | null
           created_at?: string
           expires_at?: string
@@ -319,6 +481,54 @@ export type Database = {
           text_overlay?: string | null
           user_id?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      story_highlight_items: {
+        Row: {
+          created_at: string
+          highlight_id: string
+          id: string
+          story_id: string
+        }
+        Insert: {
+          created_at?: string
+          highlight_id: string
+          id?: string
+          story_id: string
+        }
+        Update: {
+          created_at?: string
+          highlight_id?: string
+          id?: string
+          story_id?: string
+        }
+        Relationships: []
+      }
+      story_highlights: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -411,6 +621,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_tags: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          tagged_user_id: string
+          tagger_user_id: string
+          x_position: number | null
+          y_position: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          tagged_user_id: string
+          tagger_user_id: string
+          x_position?: number | null
+          y_position?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          tagged_user_id?: string
+          tagger_user_id?: string
+          x_position?: number | null
+          y_position?: number | null
+        }
+        Relationships: []
       }
     }
     Views: {

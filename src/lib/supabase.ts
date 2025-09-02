@@ -21,11 +21,17 @@ export interface Post {
   user_id: string;
   content: string;
   images: string[] | null;
+  video_url?: string | null;
+  aspect_ratio?: string;
+  is_reel?: boolean;
   created_at: string;
   updated_at: string;
   profiles?: Profile;
   post_likes?: { user_id: string }[];
   comments?: Comment[];
+  hashtags?: Hashtag[];
+  user_tags?: UserTag[];
+  is_saved?: boolean;
 }
 
 export interface Comment {
@@ -45,11 +51,48 @@ export interface Story {
   video_url: string | null;
   text_overlay: string | null;
   text_color: string | null;
+  close_friends_only?: boolean;
   expires_at: string;
   created_at: string;
   profiles?: Profile;
   story_views?: { user_id: string }[];
   story_likes?: { user_id: string }[];
+}
+
+export interface Hashtag {
+  id: string;
+  name: string;
+  post_count: number;
+  created_at: string;
+}
+
+export interface UserTag {
+  id: string;
+  post_id: string;
+  tagged_user_id: string;
+  tagger_user_id: string;
+  x_position?: number;
+  y_position?: number;
+  created_at: string;
+  profiles?: Profile;
+}
+
+export interface StoryHighlight {
+  id: string;
+  user_id: string;
+  title: string;
+  cover_image_url?: string;
+  created_at: string;
+  updated_at: string;
+  stories?: Story[];
+}
+
+export interface SavedPost {
+  id: string;
+  user_id: string;
+  post_id: string;
+  created_at: string;
+  posts?: Post;
 }
 
 export interface Conversation {
@@ -267,11 +310,19 @@ export const getPosts = async (): Promise<Post[]> => {
   return postsWithDetails;
 };
 
-export const createPost = async (content: string, imageFiles?: File[]): Promise<Post> => {
+export const createPost = async (
+  content: string, 
+  imageFiles?: File[], 
+  videoFile?: File,
+  isReel: boolean = false,
+  aspectRatio: string = '1:1',
+  hashtags?: string[]
+): Promise<Post> => {
   const user = await getCurrentUser();
   if (!user) throw new Error('Not authenticated');
 
   let imageUrls: string[] = [];
+  let videoUrl: string | null = null;
   
   // Upload images if provided
   if (imageFiles && imageFiles.length > 0) {
@@ -280,18 +331,32 @@ export const createPost = async (content: string, imageFiles?: File[]): Promise<
     );
     imageUrls = await Promise.all(uploadPromises);
   }
+  
+  // Upload video if provided
+  if (videoFile) {
+    videoUrl = await uploadFile(videoFile, 'posts', user.id);
+  }
 
   const { data, error } = await supabase
     .from('posts')
     .insert({
       user_id: user.id,
       content,
-      images: imageUrls.length > 0 ? imageUrls : null
+      images: imageUrls.length > 0 ? imageUrls : null,
+      video_url: videoUrl,
+      is_reel: isReel,
+      aspect_ratio: aspectRatio
     })
     .select()
     .single();
 
   if (error) throw error;
+  
+  // Add hashtags if provided
+  if (hashtags && hashtags.length > 0) {
+    await addHashtagsToPost(data.id, hashtags);
+  }
+  
   return data;
 };
 
@@ -363,6 +428,277 @@ export const addPostComment = async (postId: string, content: string): Promise<C
   return data;
 };
 
+// Hashtag functions
+export const addHashtagsToPost = async (postId: string, hashtags: string[]): Promise<void> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  for (const hashtagName of hashtags) {
+    // Clean hashtag name
+    const cleanName = hashtagName.replace('#', '').toLowerCase().trim();
+    if (!cleanName) continue;
+
+    // Get or create hashtag
+    let { data: hashtag } = await supabase
+      .from('hashtags')
+      .select('id')
+      .eq('name', cleanName)
+      .single();
+
+    if (!hashtag) {
+      const { data: newHashtag, error } = await supabase
+        .from('hashtags')
+        .insert({ name: cleanName })
+        .select('id')
+        .single();
+      
+      if (error) throw error;
+      hashtag = newHashtag;
+    }
+
+    // Link post to hashtag
+    await supabase
+      .from('post_hashtags')
+      .insert({
+        post_id: postId,
+        hashtag_id: hashtag.id
+      });
+  }
+};
+
+export const getHashtags = async (limit: number = 50): Promise<Hashtag[]> => {
+  const { data, error } = await supabase
+    .from('hashtags')
+    .select('*')
+    .order('post_count', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const searchHashtags = async (query: string): Promise<Hashtag[]> => {
+  const { data, error } = await supabase
+    .from('hashtags')
+    .select('*')
+    .ilike('name', `%${query}%`)
+    .order('post_count', { ascending: false })
+    .limit(20);
+
+  if (error) throw error;
+  return data || [];
+};
+
+// User tagging functions
+export const tagUsersInPost = async (postId: string, userTags: Array<{
+  userId: string;
+  x: number;
+  y: number;
+}>): Promise<void> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const tagData = userTags.map(tag => ({
+    post_id: postId,
+    tagged_user_id: tag.userId,
+    tagger_user_id: user.id,
+    x_position: tag.x,
+    y_position: tag.y
+  }));
+
+  const { error } = await supabase
+    .from('user_tags')
+    .insert(tagData);
+
+  if (error) throw error;
+};
+
+// Saved posts functions
+export const savePost = async (postId: string): Promise<void> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('saved_posts')
+    .insert({
+      user_id: user.id,
+      post_id: postId
+    });
+
+  if (error && !error.message.includes('duplicate')) throw error;
+};
+
+export const unsavePost = async (postId: string): Promise<void> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('saved_posts')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('post_id', postId);
+
+  if (error) throw error;
+};
+
+export const getSavedPosts = async (): Promise<Post[]> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: savedData, error } = await supabase
+    .from('saved_posts')
+    .select('post_id')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  
+  if (!savedData || savedData.length === 0) return [];
+  
+  const postIds = savedData.map(item => item.post_id);
+  
+  const { data: posts, error: postsError } = await supabase
+    .from('posts')
+    .select('*')
+    .in('id', postIds);
+    
+  if (postsError) throw postsError;
+  
+  // Get profiles for posts
+  const postsWithProfiles = await Promise.all(
+    (posts || []).map(async (post) => {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', post.user_id)
+        .single();
+      
+      return { ...post, profiles: profileData };
+    })
+  );
+  
+  return postsWithProfiles;
+};
+
+// Story highlights functions
+export const createStoryHighlight = async (title: string, coverImageUrl?: string): Promise<StoryHighlight> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data, error } = await supabase
+    .from('story_highlights')
+    .insert({
+      user_id: user.id,
+      title,
+      cover_image_url: coverImageUrl
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const addStoryToHighlight = async (highlightId: string, storyId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('story_highlight_items')
+    .insert({
+      highlight_id: highlightId,
+      story_id: storyId
+    });
+
+  if (error && !error.message.includes('duplicate')) throw error;
+};
+
+export const getUserHighlights = async (userId: string): Promise<StoryHighlight[]> => {
+  const { data: highlights, error } = await supabase
+    .from('story_highlights')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  
+  if (!highlights || highlights.length === 0) return [];
+  
+  // Get stories for each highlight
+  const highlightsWithStories = await Promise.all(
+    highlights.map(async (highlight) => {
+      const { data: highlightItems } = await supabase
+        .from('story_highlight_items')
+        .select('story_id')
+        .eq('highlight_id', highlight.id);
+        
+      if (!highlightItems || highlightItems.length === 0) {
+        return { ...highlight, stories: [] };
+      }
+      
+      const storyIds = highlightItems.map(item => item.story_id);
+      const { data: stories } = await supabase
+        .from('stories')
+        .select('*')
+        .in('id', storyIds);
+        
+      return { ...highlight, stories: stories || [] };
+    })
+  );
+  
+  return highlightsWithStories;
+};
+
+// Close friends functions
+export const addCloseFriend = async (friendId: string): Promise<void> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('close_friends')
+    .insert({
+      user_id: user.id,
+      friend_id: friendId
+    });
+
+  if (error && !error.message.includes('duplicate')) throw error;
+};
+
+export const removeCloseFriend = async (friendId: string): Promise<void> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('close_friends')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('friend_id', friendId);
+
+  if (error) throw error;
+};
+
+export const getCloseFriends = async (): Promise<Profile[]> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: friendsData, error } = await supabase
+    .from('close_friends')
+    .select('friend_id')
+    .eq('user_id', user.id);
+
+  if (error) throw error;
+  
+  if (!friendsData || friendsData.length === 0) return [];
+  
+  const friendIds = friendsData.map(item => item.friend_id);
+  
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('user_id', friendIds);
+    
+  if (profilesError) throw profilesError;
+  
+  return profiles || [];
+};
+
 // Stories functions
 export const getStories = async (): Promise<Story[]> => {
   const { data, error } = await supabase
@@ -402,7 +738,8 @@ export const createStory = async (
   imageFile?: File | null,
   videoFile?: File | null,
   textOverlay?: string | null,
-  textColor?: string | null
+  textColor?: string | null,
+  closeFriendsOnly: boolean = false
 ): Promise<Story> => {
   const user = await getCurrentUser();
   if (!user) throw new Error('Not authenticated');
@@ -426,7 +763,8 @@ export const createStory = async (
       image_url: imageUrl,
       video_url: videoUrl,
       text_overlay: textOverlay,
-      text_color: textColor
+      text_color: textColor,
+      close_friends_only: closeFriendsOnly
     })
     .select()
     .single();
