@@ -109,18 +109,18 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between px-4 h-16">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate(-1)}
-              className="text-foreground"
+              className="text-foreground hover:bg-accent rounded-xl"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={22} />
             </Button>
-            <h1 className="text-lg font-semibold text-foreground">Settings</h1>
+            <h1 className="text-xl font-bold text-foreground">Settings</h1>
           </div>
         </div>
       </header>
@@ -128,11 +128,11 @@ const Settings = () => {
       <div className="px-4 py-6 space-y-6">
         {/* Profile Section */}
         <Card 
-          className="bg-card border-border cursor-pointer hover:bg-muted/50 transition-colors"
+          className="border-0 bg-card/50 hover:bg-card/80 cursor-pointer transition-all duration-300 rounded-2xl"
           onClick={() => navigate(`/user/${profile.user_id}`)}
         >
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
                 <AvatarImage src={profile.avatar_url} />
                 <AvatarFallback className="bg-gradient-primary text-primary-foreground font-bold text-xl">
@@ -140,15 +140,15 @@ const Settings = () => {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground">{profile.full_name || profile.username}</h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-bold text-foreground text-lg">{profile.full_name || profile.username}</h3>
                   {profile.is_verified && <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>}
-                  {profile.is_admin && <span className="px-2 py-1 bg-red-500 text-white text-xs rounded">ADMIN</span>}
+                  {profile.is_admin && <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-md">ADMIN</span>}
                 </div>
-                <p className="text-muted-foreground">@{profile.username}</p>
-                <p className="text-sm text-muted-foreground mt-1">View and edit profile</p>
+                <p className="text-muted-foreground font-medium">@{profile.username}</p>
+                <p className="text-sm text-muted-foreground/70 mt-1">View and edit profile</p>
               </div>
-              <ChevronRight size={20} className="text-muted-foreground" />
+              <ChevronRight size={20} className="text-muted-foreground/50" />
             </div>
           </CardContent>
         </Card>

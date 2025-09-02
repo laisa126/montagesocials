@@ -108,16 +108,16 @@ const Search = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="px-4 py-3">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
+        <div className="px-4 py-4">
           <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <Input
               type="text"
               placeholder="Search users and posts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-full border-input bg-muted/50"
+              className="pl-12 h-11 rounded-xl border-0 bg-muted/80 text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-accent"
             />
           </div>
         </div>
@@ -130,26 +130,26 @@ const Search = () => {
             <div>
               <h2 className="text-lg font-semibold text-foreground mb-4">Discover People</h2>
               <div className="grid grid-cols-2 gap-4">
-                {users.filter(user => user.user_id !== currentUser?.id).slice(0, 6).map(user => (
+                 {users.filter(user => user.user_id !== currentUser?.id).slice(0, 6).map(user => (
                   <Card 
                     key={user.id} 
-                    className="border border-border hover:border-primary/20 transition-colors cursor-pointer"
+                    className="border-0 bg-card/50 hover:bg-card/80 transition-all duration-300 cursor-pointer rounded-xl"
                     onClick={() => navigate(`/user/${user.user_id}`)}
                   >
-                    <CardContent className="p-4 text-center">
-                      <Avatar className="w-16 h-16 mx-auto mb-3">
+                    <CardContent className="p-5 text-center">
+                      <Avatar className="w-16 h-16 mx-auto mb-4">
                         <AvatarImage src={user.avatar_url} />
-                        <AvatarFallback className="bg-gradient-primary text-primary-foreground font-semibold">
+                        <AvatarFallback className="bg-gradient-primary text-primary-foreground font-bold text-lg">
                           {(user.full_name || user.username || 'U').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <h3 className="font-semibold text-sm text-foreground">{user.username}</h3>
-                      <p className="text-xs text-muted-foreground mb-3 truncate">{user.full_name}</p>
-                      <div className="flex gap-2">
+                      <h3 className="font-bold text-sm text-foreground mb-1">{user.username}</h3>
+                      <p className="text-xs text-muted-foreground mb-4 truncate">{user.full_name}</p>
+                      <div className="flex gap-2 justify-center">
                         <Button 
                           size="sm" 
-                          variant={isFollowing(user.user_id) ? "outline" : "default"}
-                          className="text-xs px-3 py-1 rounded-full"
+                          variant={isFollowing(user.user_id) ? "secondary" : "default"}
+                          className="text-xs px-4 py-2 rounded-xl font-medium"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleFollowToggle(user.user_id);
@@ -159,14 +159,14 @@ const Search = () => {
                         </Button>
                         <Button 
                           size="sm" 
-                          variant="outline"
-                          className="text-xs px-2 py-1 rounded-full"
+                          variant="ghost"
+                          className="text-xs px-3 py-2 rounded-xl"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/messages/chat/${user.user_id}`);
                           }}
                         >
-                          <MessageCircle size={12} />
+                          <MessageCircle size={14} />
                         </Button>
                       </div>
                     </CardContent>

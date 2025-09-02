@@ -75,23 +75,23 @@ const Messages = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between px-4 h-16">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate(-1)}
-              className="text-foreground hover:text-primary"
+              className="text-foreground hover:bg-accent rounded-xl"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={22} />
             </Button>
-            <h1 className="text-lg font-semibold text-foreground">Messages</h1>
+            <h1 className="text-xl font-bold text-foreground">Messages</h1>
           </div>
           <Button 
             variant="ghost" 
             size="icon"
-            className="text-foreground hover:text-primary"
+            className="text-foreground hover:bg-accent rounded-xl"
           >
             <Edit size={20} />
           </Button>
@@ -101,13 +101,13 @@ const Messages = () => {
       <div className="p-4 space-y-4">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <Input
             type="text"
             placeholder="Search messages..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-full border-input bg-muted/50"
+            className="pl-12 h-11 rounded-xl border-0 bg-muted/80 text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-accent"
           />
         </div>
 

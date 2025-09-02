@@ -77,19 +77,19 @@ const Activity = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
         <div className="px-4 h-16 flex items-center">
-          <h1 className="text-lg font-semibold text-foreground">Activity</h1>
+          <h1 className="text-xl font-bold text-foreground">Activity</h1>
         </div>
       </header>
 
       <div className="p-4">
         <Tabs defaultValue="you" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-muted rounded-full p-1 mb-6">
-            <TabsTrigger value="you" className="rounded-full">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/80 rounded-2xl p-1 mb-6 h-12">
+            <TabsTrigger value="you" className="rounded-xl font-medium data-[state=active]:bg-card data-[state=active]:text-foreground">
               For you
             </TabsTrigger>
-            <TabsTrigger value="following" className="rounded-full">
+            <TabsTrigger value="following" className="rounded-xl font-medium data-[state=active]:bg-card data-[state=active]:text-foreground">
               Following
             </TabsTrigger>
           </TabsList>
