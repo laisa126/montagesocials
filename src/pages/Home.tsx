@@ -1,40 +1,262 @@
 import { useState, useEffect } from "react";
-import { Plus, Play, MessageCircle, Send, Bookmark, Camera, Heart } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { getPosts, likePost, unlikePost, getAllProfiles, getStories } from "@/lib/supabase";
-import { Profile, Post, Story } from "@/lib/supabase";
+import {
+  Home,
+  Search,
+  PlusSquare,
+  Film,
+  User,
+  Heart,
+  MessageCircle,
+  RefreshCw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const Home = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [stories, setStories] = useState<Story[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Post {
+  id: number;
+  username: string;
+  avatar: string;
+  is_verified: boolean;
+  image: string;
+  likes: number;
+  caption: string;
+  comments: { id: number; user: string; text: string }[];
+}
+
+const samplePosts: Post[] = [
+  {
+    id: 1,
+    username: "john_doe",
+    avatar: "/avatars/john.png",
+    is_verified: true,
+    image: "/posts/post1.jpg",
+    likes: 245,
+    caption: "Beautiful day at the beach 🌊",
+    comments: [
+      { id: 1, user: "sarah", text: "Wow looks amazing!" },
+      { id: 2, user: "alex", text: "Take me there!" },
+    ],
+  },
+  {
+    id: 2,
+    username: "sarah_lee",
+    avatar: "/avatars/sarah.png",
+    is_verified: false,
+    image: "/posts/post2.jpg",
+    likes: 120,
+    caption: "Coffee vibes ☕✨",
+    comments: [{ id: 1, user: "mike", text: "I need that coffee now" }],
+  },
+];
+
+export default function HomePage() {
+  const [posts, setPosts] = useState<Post[]>(samplePosts);
+  const [loading, setLoading] = useState(false);
+  const [commentingPost, setCommentingPost] = useState<Post | null>(null);
+  const [newComment, setNewComment] = useState("");
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user, profile } = useAuth();
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [postsData, profilesData, storiesData] = await Promise.all([
-          getPosts(),
-          getAllProfiles(),
-          getStories()
-        ]);
-        
-        setPosts(postsData);
-        setProfiles(profilesData);
+  const refreshFeed = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setPosts((prev) => [...prev, ...samplePosts]); // simulate new posts
+      setLoading(false);
+    }, 1500);
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim() || !commentingPost) return;
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === commentingPost.id
+          ? {
+              ...p,
+              comments: [
+                ...p.comments,
+                { id: Date.now(), user: "you", text: newComment },
+              ],
+            }
+          : p
+      )
+    );
+    setNewComment("");
+    setCommentingPost(null);
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-white">
+      {/* 🔝 Top bar */}
+      <div className="flex justify-between items-center px-4 py-2 border-b">
+        <h1 className="font-bold text-lg">Montage</h1>
+        <div className="flex space-x-4">
+          <Heart className="w-6 h-6" />
+          <MessageCircle className="w-6 h-6" />
+        </div>
+      </div>
+
+      {/* 🔄 Refresh */}
+      <div className="flex justify-center p-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={refreshFeed}
+          disabled={loading}
+        >
+          <RefreshCw
+            className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
+          />
+          {loading ? "Refreshing..." : "Tap to refresh"}
+        </Button>
+      </div>
+
+      {/* 📰 Feed */}
+      <div className="flex-1 overflow-y-auto">
+        {posts.map((post) => (
+          <div key={post.id} className="border-b pb-4 mb-4">
+            {/* Post header */}
+            <div className="flex items-center p-2">
+              <img
+                src={post.avatar}
+                alt={post.username}
+                className="w-10 h-10 rounded-full"
+              />
+              <div className="ml-2 flex items-center font-semibold">
+                {post.username}
+                {post.is_verified && (
+                  <span className="ml-1 inline-flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="w-4 h-4"
+                    >
+                      <defs>
+                        <linearGradient
+                          id="metaVerifiedGradient"
+                          x1="0"
+                          y1="0"
+                          x2="1"
+                          y2="1"
+                        >
+                          <stop offset="0%" stopColor="#48a6ff" />
+                          <stop offset="100%" stopColor="#0064e0" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        d="M12 2.25l2.05 1.15 2.3-.45 1.2 2.05 2.3.7.15 2.35 1.7 1.6-1 2.15.5 2.3-2.05 1.1-.7 2.3-2.35.15-1.6 1.7-2.15-1-2.3.5-1.1-2.05-2.3-.7-.15-2.35-1.7-1.6 1-2.15-.5-2.3 2.05-1.1.7-2.3 2.35-.15L12 2.25z"
+                        fill="url(#metaVerifiedGradient)"
+                      />
+                      <path
+                        d="M9.5 12.2l1.8 1.8 3.2-3.6"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Post image */}
+            <img
+              src={post.image}
+              alt="post"
+              className="w-full h-80 object-cover"
+            />
+
+            {/* Actions */}
+            <div className="flex space-x-4 px-2 py-2">
+              <Heart className="w-6 h-6" />
+              <MessageCircle
+                className="w-6 h-6"
+                onClick={() => setCommentingPost(post)}
+              />
+            </div>
+
+            {/* Likes + Caption */}
+            <div className="px-2">
+              <p className="font-semibold">{post.likes} likes</p>
+              <p>
+                <span className="font-semibold">{post.username}</span>{" "}
+                {post.caption}
+              </p>
+              <button
+                className="text-sm text-gray-500"
+                onClick={() => setCommentingPost(post)}
+              >
+                View all {post.comments.length} comments
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {/* End of feed */}
+        <div className="text-center text-gray-500 py-4">
+          🎉 You’re all caught up!
+        </div>
+
+        {/* People you may know */}
+        <div className="p-4 border-t">
+          <h2 className="font-semibold mb-2">People you may know</h2>
+          <div className="flex space-x-4 overflow-x-auto">
+            {["alex", "mike", "sophia"].map((user) => (
+              <div
+                key={user}
+                className="flex flex-col items-center w-20 text-center"
+              >
+                <img
+                  src={`/avatars/${user}.png`}
+                  className="w-16 h-16 rounded-full"
+                />
+                <p className="text-sm">{user}</p>
+                <Button size="sm" className="mt-1">
+                  Follow
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 💬 Comment modal */}
+      {commentingPost && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end">
+          <div className="bg-white w-full p-4 rounded-t-2xl">
+            <h2 className="font-semibold mb-2">Comments</h2>
+            <div className="max-h-60 overflow-y-auto">
+              {commentingPost.comments.map((c) => (
+                <p key={c.id}>
+                  <span className="font-semibold">{c.user}:</span> {c.text}
+                </p>
+              ))}
+            </div>
+            <div className="flex mt-2">
+              <input
+                className="flex-1 border rounded px-2"
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+              <Button className="ml-2" onClick={handleAddComment}>
+                Post
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📱 Bottom Tabs */}
+      <div className="flex justify-around items-center border-t py-2 bg-white">
+        <Home className="w-6 h-6" />
+        <Search className="w-6 h-6" />
+        <PlusSquare className="w-6 h-6" />
+        <Film className="w-6 h-6" />
+        <User className="w-6 h-6" />
+      </div>
+    </div>
+  );
+  }        setProfiles(profilesData);
         setStories(storiesData);
       } catch (error) {
         console.error('Error loading data:', error);
