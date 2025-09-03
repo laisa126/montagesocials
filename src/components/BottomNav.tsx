@@ -55,26 +55,12 @@ const BottomNav = () => {
             }`}
           >
             {item.isProfile ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="w-6 h-6 cursor-pointer">
-                    <AvatarImage src={profile?.avatar_url} />
-                    <AvatarFallback className="bg-muted text-foreground text-xs font-medium">
-                      {(profile?.full_name || profile?.username || 'U').charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/profile')}>
-                    <User className="mr-2 h-4 w-4" />
-                    View Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Avatar className="w-6 h-6 cursor-pointer">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback className="bg-muted text-foreground text-xs font-medium">
+                  {(profile?.full_name || profile?.username || 'U').charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             ) : (
               <item.icon size={22} strokeWidth={1.5} />
             )}

@@ -183,7 +183,7 @@ const Home = () => {
             </span>
           </button>
 
-          {/* Other Users' Stories */}
+        {/* Other Users' Stories */}
           {usersWithStories
             .filter(userProfile => userProfile.user_id !== user.id)
             .map(userProfile => {
@@ -194,10 +194,10 @@ const Home = () => {
               return (
                 <button
                   key={userProfile.user_id} 
-                  className="flex flex-col items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity"
-                  onClick={() => navigate(`/story/${userProfile.user_id}/0`)}
+                  className="flex flex-col items-center gap-2 flex-shrink-0 hover:opacity-80 transition-all duration-200 hover:scale-105"
+                  onClick={() => navigate(`/stories/${userProfile.user_id}`)}
                 >
-                  <div className="p-0.5 bg-primary rounded-full">
+                  <div className="p-0.5 bg-gradient-story rounded-full animate-pulse">
                     <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-background">
                       <img 
                         src={userProfile.avatar_url || '/placeholder.svg'} 
