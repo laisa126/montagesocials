@@ -907,6 +907,36 @@ export const getFollowing = async (userId: string) => {
   return followingWithProfiles;
 };
 
+// Get follower count
+export const getFollowerCount = async (userId: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('followers')
+    .select('*', { count: 'exact', head: true })
+    .eq('following_id', userId);
+
+  if (error) {
+    console.error('Error getting follower count:', error);
+    return 0;
+  }
+
+  return count || 0;
+};
+
+// Get following count
+export const getFollowingCount = async (userId: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('followers')
+    .select('*', { count: 'exact', head: true })
+    .eq('follower_id', userId);
+
+  if (error) {
+    console.error('Error getting following count:', error);
+    return 0;
+  }
+
+  return count || 0;
+};
+
 export const isFollowing = async (targetUserId: string): Promise<boolean> => {
   const user = await getCurrentUser();
   if (!user) return false;

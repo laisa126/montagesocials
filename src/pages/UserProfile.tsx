@@ -16,6 +16,8 @@ import {
   unfollowUser, 
   getFollowers,
   getFollowing,
+  getFollowerCount,
+  getFollowingCount,
   Profile, 
   Post 
 } from "@/lib/supabase";
@@ -27,6 +29,8 @@ const UserProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,11 +47,13 @@ const UserProfile = () => {
       
       try {
         setLoading(true);
-        const [profileData, postsData, followersData, followingData] = await Promise.all([
+        const [profileData, postsData, followersData, followingData, followersCountData, followingCountData] = await Promise.all([
           getProfileById(userId),
           getPosts(),
           getFollowers(userId),
-          getFollowing(userId)
+          getFollowing(userId),
+          getFollowerCount(userId),
+          getFollowingCount(userId)
         ]);
         
         if (profileData) {
@@ -59,6 +65,8 @@ const UserProfile = () => {
           
           setFollowers(followersData);
           setFollowing(followingData);
+          setFollowersCount(followersCountData);
+          setFollowingCount(followingCountData);
           
           // Check if current user is following this profile
           const isCurrentlyFollowing = followersData.some(f => f.follower_id === user.id);
@@ -87,6 +95,7 @@ const UserProfile = () => {
         await unfollowUser(profileUser.user_id);
         setIsFollowing(false);
         setFollowers(prev => prev.filter(f => f.follower_id !== user.id));
+        setFollowersCount(prev => prev - 1);
         toast({
           title: "Unfollowed",
           description: `You unfollowed @${profileUser.username}`,
@@ -95,6 +104,7 @@ const UserProfile = () => {
         await followUser(profileUser.user_id);
         setIsFollowing(true);
         setFollowers(prev => [...prev, { follower_id: user.id }]);
+        setFollowersCount(prev => prev + 1);
         toast({
           title: "Following",
           description: `You are now following @${profileUser.username}`,
@@ -197,14 +207,14 @@ const UserProfile = () => {
             className="text-center hover:opacity-80 transition-opacity"
             onClick={() => navigate(`/user/${profileUser.user_id}/followers`)}
           >
-            <div className="text-2xl font-bold text-foreground">{followers.length}</div>
+            <div className="text-2xl font-bold text-foreground">{followersCount}</div>
             <div className="text-sm text-muted-foreground font-medium">Followers</div>
           </button>
           <button 
             className="text-center hover:opacity-80 transition-opacity"
             onClick={() => navigate(`/user/${profileUser.user_id}/following`)}
           >
-            <div className="text-2xl font-bold text-foreground">{following.length}</div>
+            <div className="text-2xl font-bold text-foreground">{followingCount}</div>
             <div className="text-sm text-muted-foreground font-medium">Following</div>
           </button>
         </div>

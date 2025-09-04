@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GradientButton } from "@/components/ui/button-variants";
 import { useAuth } from "@/hooks/useAuth";
-import { updateProfile, getPosts, type Profile as ProfileType, type Post } from "@/lib/supabase";
+import { updateProfile, getPosts, getFollowerCount, getFollowingCount, type Profile as ProfileType, type Post } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const { user, profile, loading } = useAuth();
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editForm, setEditForm] = useState({
     full_name: "",
@@ -40,8 +42,9 @@ const Profile = () => {
         avatar_url: profile.avatar_url || ""
       });
 
-      // Get user's posts
+      // Get user's posts and counts
       loadUserPosts();
+      loadCounts();
     }
   }, [loading, user, profile, navigate]);
 
@@ -54,6 +57,21 @@ const Profile = () => {
       setUserPosts(myPosts);
     } catch (error) {
       console.error('Error loading posts:', error);
+    }
+  };
+
+  const loadCounts = async () => {
+    if (!user) return;
+    
+    try {
+      const [followersCountData, followingCountData] = await Promise.all([
+        getFollowerCount(user.id),
+        getFollowingCount(user.id)
+      ]);
+      setFollowersCount(followersCountData);
+      setFollowingCount(followingCountData);
+    } catch (error) {
+      console.error('Error loading counts:', error);
     }
   };
 
@@ -166,14 +184,20 @@ const Profile = () => {
                 <p className="text-xl font-medium text-foreground">{userPosts.length}</p>
                 <p className="text-sm text-muted-foreground">Posts</p>
               </div>
-              <div>
-                <p className="text-xl font-medium text-foreground">0</p>
+              <button 
+                className="text-center hover:opacity-80 transition-opacity"
+                onClick={() => navigate(`/user/${user.id}/followers`)}
+              >
+                <p className="text-xl font-medium text-foreground">{followersCount}</p>
                 <p className="text-sm text-muted-foreground">Followers</p>
-              </div>
-              <div>
-                <p className="text-xl font-medium text-foreground">0</p>
+              </button>
+              <button 
+                className="text-center hover:opacity-80 transition-opacity"
+                onClick={() => navigate(`/user/${user.id}/following`)}
+              >
+                <p className="text-xl font-medium text-foreground">{followingCount}</p>
                 <p className="text-sm text-muted-foreground">Following</p>
-              </div>
+              </button>
             </div>
           </div>
 
