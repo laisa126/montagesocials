@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Edit, Send } from "lucide-react";
+import { ArrowLeft, Search, Edit, Send, Bot, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -205,6 +205,20 @@ const Messages = () => {
             )
           )}
         </div>
+      </div>
+
+      {/* Montage AI Overlay */}
+      <div className="fixed bottom-24 right-4 z-50">
+        <Button
+          onClick={() => window.open('https://montagea-ai.vercel.app/', '_blank')}
+          className="w-14 h-14 rounded-full bg-gradient-primary text-primary-foreground shadow-glow hover:shadow-lg hover:scale-105 transition-all duration-300 p-0 border-2 border-background/20"
+        >
+          <div className="relative flex items-center justify-center">
+            <Bot size={24} className="relative z-10" />
+            <div className="absolute inset-0 rounded-full bg-gradient-primary animate-pulse opacity-50" />
+            <Sparkles size={12} className="absolute -top-1 -right-1 text-yellow-400 animate-bounce" />
+          </div>
+        </Button>
       </div>
     </div>
   );
