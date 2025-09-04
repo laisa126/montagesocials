@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Grid, Bookmark, Heart, MoreHorizontal, Settings } from "lucide-react";
+import { ArrowLeft, Settings, MoreHorizontal, Grid, Bookmark, Heart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { GradientButton } from "@/components/ui/button-variants";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -12,24 +14,23 @@ import {
   getPosts, 
   followUser, 
   unfollowUser, 
-  getFollowers, 
-  getFollowing, 
+  getFollowers,
+  getFollowing,
   Profile, 
   Post 
 } from "@/lib/supabase";
 
 const UserProfile = () => {
   const { userId } = useParams<{ userId: string }>();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user, profile } = useAuth();
-
   const [profileUser, setProfileUser] = useState<Profile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user, profile } = useAuth();
 
   useEffect(() => {
     if (!user) {
@@ -147,16 +148,13 @@ const UserProfile = () => {
               )}
             </div>
           </div>
-          {isOwnProfile && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate("/settings")}
-              className="text-foreground hover:text-primary"
-            >
-              <Settings size={20} />
-            </Button>
-          )}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="text-foreground hover:text-primary"
+          >
+            <MoreHorizontal size={20} />
+          </Button>
         </div>
       </header>
 
