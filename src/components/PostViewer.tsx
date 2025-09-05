@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, MessageCircle, Send, Bookmark, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getPostById, likePost, unlikePost, getComments, addComment, getPostLikes, Post, Comment } from "@/lib/supabase";
+import { getPostById, likePost, unlikePost, getComments, addComment, getPostLikes, savePost, unsavePost, getSavedPosts, Post, Comment } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import ImageCarousel from "@/components/ImageCarousel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const PostViewer = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -15,6 +22,7 @@ const PostViewer = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
@@ -29,16 +37,18 @@ const PostViewer = () => {
 
     const loadPost = async () => {
       try {
-        const [postData, commentsData, likesData] = await Promise.all([
+        const [postData, commentsData, likesData, savedData] = await Promise.all([
           getPostById(postId),
           getComments(postId),
-          getPostLikes(postId)
+          getPostLikes(postId),
+          getSavedPosts().catch(() => [])
         ]);
 
         setPost(postData);
         setComments(commentsData);
         setLikesCount(likesData.length);
         setIsLiked(likesData.some(like => like.user_id === currentUser.id));
+        setIsSaved(savedData.some(sp => sp.post_id === postId));
       } catch (error) {
         console.error('Error loading post:', error);
         toast({
@@ -74,6 +84,68 @@ const PostViewer = () => {
         description: "Failed to update like status.",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!post || !currentUser) return;
+
+    try {
+      if (isSaved) {
+        await unsavePost(post.id);
+        setIsSaved(false);
+        toast({
+          title: "Post unsaved",
+          description: "Removed from your saved posts.",
+        });
+      } else {
+        await savePost(post.id);
+        setIsSaved(true);
+        toast({
+          title: "Post saved",
+          description: "Added to your saved posts.",
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update saved status.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleShare = async () => {
+    if (!post) return;
+    
+    const shareText = `Check out this post by ${post.profiles?.username} on Montage`;
+    const shareUrl = `${window.location.origin}/post/${post.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareText,
+          text: post.content,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Share cancelled');
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link copied",
+          description: "Post link copied to clipboard",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to copy link",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -166,28 +238,55 @@ const PostViewer = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground">{post.profiles?.username}</h3>
-                    {post.profiles?.is_verified && (
-                      <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">{formatTime(post.created_at)}</p>
-                </div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-foreground">{post.profiles?.username}</h3>
+                {post.profiles?.is_verified && (
+                  <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                )}
               </div>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal size={20} />
+              <p className="text-xs text-muted-foreground">{formatTime(post.created_at)}</p>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:bg-muted">
+                <MoreHorizontal size={16} />
               </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={handleShare}>
+                <Share size={16} className="mr-2" />
+                Share post
+              </DropdownMenuItem>
+              {post.user_id !== currentUser?.id && (
+                <DropdownMenuItem className="text-destructive">
+                  Report post
+                </DropdownMenuItem>
+              )}
+              {post.user_id === currentUser?.id && (
+                <DropdownMenuItem className="text-destructive">
+                  Delete post
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
             </div>
 
             {/* Post Images */}
             {post.images && post.images.length > 0 && (
               <div className="aspect-square bg-muted">
-                <img 
-                  src={post.images[0]} 
-                  alt="Post content"
-                  className="w-full h-full object-cover"
-                />
+                {post.images.length === 1 ? (
+                  <img 
+                    src={post.images[0]} 
+                    alt="Post content"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <ImageCarousel 
+                    images={post.images} 
+                    className="aspect-square"
+                  />
+                )}
               </div>
             )}
 
@@ -206,12 +305,22 @@ const PostViewer = () => {
                   <Button variant="ghost" size="icon" className="text-foreground">
                     <MessageCircle size={24} />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-foreground">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-foreground"
+                    onClick={handleShare}
+                  >
                     <Send size={24} />
                   </Button>
                 </div>
-                <Button variant="ghost" size="icon" className="text-foreground">
-                  <Bookmark size={24} />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={`text-foreground ${isSaved ? 'fill-current' : ''}`}
+                  onClick={handleSave}
+                >
+                  <Bookmark size={24} fill={isSaved ? 'currentColor' : 'none'} />
                 </Button>
               </div>
 

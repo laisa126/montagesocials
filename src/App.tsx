@@ -22,6 +22,7 @@ import PrivacySettings from "./pages/PrivacySettings";
 import HelpSettings from "./pages/HelpSettings";
 import UserProfile from "./pages/UserProfile";
 import FollowersList from "./pages/FollowersList";
+import SavedPosts from "./pages/SavedPosts";
 import Chat from "./pages/Chat";
 import StoryViewer from "./pages/StoryViewer";
 import PostViewer from "./pages/PostViewer";
@@ -43,6 +44,7 @@ const AppLayout = () => {
         <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><Create /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/saved" element={<ProtectedRoute><SavedPosts /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/messages/chat/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
         <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />

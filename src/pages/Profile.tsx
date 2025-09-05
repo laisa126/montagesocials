@@ -340,9 +340,15 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center py-12">
               <Bookmark className="w-12 h-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">Save posts for later</h3>
-              <p className="text-muted-foreground text-center">
+              <p className="text-muted-foreground text-center mb-6">
                 Bookmark posts you want to see again.
               </p>
+              <Button
+                onClick={() => navigate("/saved")}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                View Saved Posts
+              </Button>
             </div>
           </TabsContent>
 

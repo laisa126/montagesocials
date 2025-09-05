@@ -1,19 +1,28 @@
-import { useState, useEffect } from "react";
-import { Plus, Play, MessageCircle, Send, Bookmark, Camera, Heart } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Play, MessageCircle, Send, Bookmark, Camera, Heart, MoreHorizontal, Share, BookmarkIcon, RefreshCw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { getPosts, likePost, unlikePost, getAllProfiles, getStories } from "@/lib/supabase";
+import { getPosts, likePost, unlikePost, getAllProfiles, getStories, savePost, unsavePost, getSavedPosts } from "@/lib/supabase";
 import { Profile, Post, Story } from "@/lib/supabase";
+import ImageCarousel from "@/components/ImageCarousel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
+  const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, profile } = useAuth();
@@ -27,15 +36,17 @@ const Home = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [postsData, profilesData, storiesData] = await Promise.all([
+        const [postsData, profilesData, storiesData, savedData] = await Promise.all([
           getPosts(),
           getAllProfiles(),
-          getStories()
+          getStories(),
+          getSavedPosts().catch(() => [])
         ]);
         
         setPosts(postsData);
         setProfiles(profilesData);
         setStories(storiesData);
+        setSavedPostIds(savedData.map(sp => sp.post_id));
       } catch (error) {
         console.error('Error loading data:', error);
         toast({
@@ -83,6 +94,102 @@ const Home = () => {
     }
   };
 
+  const handleSave = async (postId: string) => {
+    if (!user) return;
+    
+    try {
+      const isSaved = savedPostIds.includes(postId);
+      
+      if (isSaved) {
+        await unsavePost(postId);
+        setSavedPostIds(prev => prev.filter(id => id !== postId));
+        toast({
+          title: "Post unsaved",
+          description: "Removed from your saved posts.",
+        });
+      } else {
+        await savePost(postId);
+        setSavedPostIds(prev => [...prev, postId]);
+        toast({
+          title: "Post saved",
+          description: "Added to your saved posts.",
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update saved status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleShare = async (post: Post) => {
+    const postProfile = getProfileById(post.user_id);
+    const shareText = `Check out this post by ${postProfile?.username} on Montage`;
+    const shareUrl = `${window.location.origin}/post/${post.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareText,
+          text: post.content,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Share cancelled');
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link copied",
+          description: "Post link copied to clipboard",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to copy link",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleRefresh = async () => {
+    if (refreshing) return;
+    
+    setRefreshing(true);
+    try {
+      const [postsData, profilesData, storiesData, savedData] = await Promise.all([
+        getPosts(),
+        getAllProfiles(), 
+        getStories(),
+        getSavedPosts().catch(() => [])
+      ]);
+      
+      setPosts(postsData);
+      setProfiles(profilesData);
+      setStories(storiesData);
+      setSavedPostIds(savedData.map(sp => sp.post_id));
+      
+      toast({
+        title: "Feed refreshed",
+        description: "Latest posts loaded successfully",
+      });
+    } catch (error) {
+      console.error('Error refreshing:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh feed",
+        variant: "destructive"
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
     const postDate = new Date(dateString);
@@ -124,6 +231,15 @@ const Home = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="text-foreground hover:bg-muted h-10 w-10"
+            >
+              <RefreshCw size={20} strokeWidth={2} className={refreshing ? 'animate-spin' : ''} />
+            </Button>
             <Button 
               variant="ghost" 
               size="icon"
@@ -269,6 +385,31 @@ const Home = () => {
                         <p className="text-xs text-muted-foreground">{formatTimeAgo(post.created_at)}</p>
                       </div>
                     </button>
+                    
+                    {/* Post Options Menu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:bg-muted">
+                          <MoreHorizontal size={16} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => handleShare(post)}>
+                          <Share size={16} className="mr-2" />
+                          Share post
+                        </DropdownMenuItem>
+                        {post.user_id !== user.id && (
+                          <DropdownMenuItem className="text-destructive">
+                            Report post
+                          </DropdownMenuItem>
+                        )}
+                        {post.user_id === user.id && (
+                          <DropdownMenuItem className="text-destructive">
+                            Delete post
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   {/* Post Images */}
@@ -278,11 +419,18 @@ const Home = () => {
                       onDoubleClick={() => handleLike(post.id)}
                       onClick={() => navigate(`/post/${post.id}`)}
                     >
-                      <img 
-                        src={post.images[0]} 
-                        alt="Post content"
-                        className="w-full object-contain max-h-[600px]"
-                      />
+                      {post.images.length === 1 ? (
+                        <img 
+                          src={post.images[0]} 
+                          alt="Post content"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ImageCarousel 
+                          images={post.images} 
+                          className="aspect-square"
+                        />
+                      )}
                     </div>
                   )}
 
@@ -310,12 +458,26 @@ const Home = () => {
                         >
                           <MessageCircle size={20} strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:text-foreground hover:bg-transparent">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-foreground hover:text-foreground hover:bg-transparent"
+                          onClick={() => handleShare(post)}
+                        >
                           <Send size={20} strokeWidth={1.5} />
                         </Button>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground hover:text-foreground hover:bg-transparent">
-                        <Bookmark size={20} strokeWidth={1.5} />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={`h-8 w-8 hover:bg-transparent ${
+                          savedPostIds.includes(post.id)
+                            ? 'text-foreground' 
+                            : 'text-foreground hover:text-foreground'
+                        }`}
+                        onClick={() => handleSave(post.id)}
+                      >
+                        <Bookmark size={20} fill={savedPostIds.includes(post.id) ? 'currentColor' : 'none'} strokeWidth={1.5} />
                       </Button>
                     </div>
 
