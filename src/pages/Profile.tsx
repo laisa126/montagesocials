@@ -209,76 +209,28 @@ const Profile = () => {
           </div>
 
 
-          <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full rounded-md border-border">
-                <Edit size={16} className="mr-2" />
-                Edit Profile
-              </Button>
-            </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Edit Profile</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="flex flex-col items-center gap-4">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage src={editForm.avatar_url || undefined} />
-                      <AvatarFallback className="bg-muted text-foreground text-lg font-medium">
-                        {editForm.full_name?.charAt(0).toUpperCase() || editForm.username.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <label className="cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarUpload}
-                        className="hidden"
-                      />
-                      <Button variant="outline" size="sm" asChild>
-                        <span>Change Photo</span>
-                      </Button>
-                    </label>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <Input
-                      placeholder="Full Name"
-                      value={editForm.full_name}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                    />
-                    <Input
-                      placeholder="Username"
-                      value={editForm.username}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
-                    />
-                    <Textarea
-                      placeholder="Bio"
-                      value={editForm.bio}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                      className="resize-none"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setIsEditingProfile(false)}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleSaveProfile}
-                      className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+          {/* Edit Profile and Share Profile Buttons */}
+          <div className="flex gap-3">
+            <Button
+              onClick={() => navigate("/edit-profile")}
+              className="flex-1 bg-muted text-foreground border-border hover:bg-muted/80"
+              variant="outline"
+            >
+              Edit Profile
+            </Button>
+            <Button
+              onClick={() => navigate("/archive")}
+              variant="outline"
+              size="icon"
+              className="flex-shrink-0 border-border"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+              </svg>
+            </Button>
+          </div>
         </div>
 
         {/* Content Tabs */}
@@ -287,10 +239,10 @@ const Profile = () => {
             <TabsTrigger value="posts" className="flex items-center justify-center border-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none">
               <Grid size={20} />
             </TabsTrigger>
-            <TabsTrigger value="saved" className="flex items-center justify-center border-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none">
+            <TabsTrigger value="saved" className="flex items-center justify-center border-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none" onClick={() => navigate("/saved")}>
               <Bookmark size={20} />
             </TabsTrigger>
-            <TabsTrigger value="liked" className="flex items-center justify-center border-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none">
+            <TabsTrigger value="liked" className="flex items-center justify-center border-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none" onClick={() => navigate("/liked")}>
               <Heart size={20} />
             </TabsTrigger>
           </TabsList>
@@ -356,9 +308,15 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center py-12">
               <Heart className="w-12 h-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">Posts you've liked</h3>
-              <p className="text-muted-foreground text-center">
-                When you like posts, they'll appear here.
+              <p className="text-muted-foreground text-center mb-6">
+                When you tap to like posts, they'll appear here.
               </p>
+              <Button
+                onClick={() => navigate("/liked")}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                View Liked Posts
+              </Button>
             </div>
           </TabsContent>
         </Tabs>

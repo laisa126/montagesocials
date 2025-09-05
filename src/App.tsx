@@ -23,6 +23,12 @@ import HelpSettings from "./pages/HelpSettings";
 import UserProfile from "./pages/UserProfile";
 import FollowersList from "./pages/FollowersList";
 import SavedPosts from "./pages/SavedPosts";
+import EditProfile from "./pages/EditProfile";
+import TaggedPosts from "./pages/TaggedPosts";
+import LikedPosts from "./pages/LikedPosts";
+import CloseFriends from "./pages/CloseFriends";
+import Archive from "./pages/Archive";
+import QRCode from "./pages/QRCode";
 import Chat from "./pages/Chat";
 import StoryViewer from "./pages/StoryViewer";
 import PostViewer from "./pages/PostViewer";
@@ -44,7 +50,13 @@ const AppLayout = () => {
         <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><Create /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
         <Route path="/saved" element={<ProtectedRoute><SavedPosts /></ProtectedRoute>} />
+        <Route path="/tagged" element={<ProtectedRoute><TaggedPosts /></ProtectedRoute>} />
+        <Route path="/liked" element={<ProtectedRoute><LikedPosts /></ProtectedRoute>} />
+        <Route path="/close-friends" element={<ProtectedRoute><CloseFriends /></ProtectedRoute>} />
+        <Route path="/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
+        <Route path="/qr-code" element={<ProtectedRoute><QRCode /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/messages/chat/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
         <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
