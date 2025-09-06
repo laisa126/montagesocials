@@ -541,6 +541,20 @@ export const unsavePost = async (postId: string): Promise<void> => {
   if (error) throw error;
 };
 
+export const getSavedPostIds = async (): Promise<string[]> => {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: savedData, error } = await supabase
+    .from('saved_posts')
+    .select('post_id')
+    .eq('user_id', user.id);
+
+  if (error) throw error;
+  
+  return savedData?.map(item => item.post_id) || [];
+};
+
 export const getSavedPosts = async (): Promise<Post[]> => {
   const user = await getCurrentUser();
   if (!user) throw new Error('Not authenticated');

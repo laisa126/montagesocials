@@ -20,20 +20,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        if (!mounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         // Fetch profile when user signs in
         if (session?.user) {
           setTimeout(async () => {
+            if (!mounted) return;
             try {
               const userProfile = await getCurrentProfile();
-              setProfile(userProfile);
+              if (mounted) setProfile(userProfile);
             } catch (error) {
               console.error('Error fetching profile:', error);
+              if (mounted) setProfile(null);
             }
           }, 0);
         } else {
@@ -46,17 +52,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        getCurrentProfile().then(setProfile).catch(console.error);
+        getCurrentProfile()
+          .then(profile => mounted && setProfile(profile))
+          .catch(error => {
+            console.error('Error fetching profile:', error);
+            if (mounted) setProfile(null);
+          });
+      } else {
+        setProfile(null);
       }
       
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleSignOut = async () => {

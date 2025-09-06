@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigation } from "@/hooks/useNavigation";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { navigateTo } = useNavigation();
   const { user: currentUser, profile, signOut } = useAuth();
 
   if (!currentUser) return null;
@@ -47,7 +49,7 @@ const BottomNav = () => {
             key={item.path}
             variant="ghost"
             size="icon"
-            onClick={() => navigate(item.path)}
+            onClick={() => navigateTo(item.path)}
             className={`h-10 w-10 rounded-none transition-colors ${
               isActive(item.path) 
                 ? "text-foreground" 

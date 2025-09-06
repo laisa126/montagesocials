@@ -9,6 +9,7 @@ import { getAllProfiles, banUser as supabaseBanUser, verifyUser as supabaseVerif
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { VerificationBadge } from "@/components/ui/verification-badge";
+import BackButton from "@/components/BackButton";
 
 const Settings = () => {
   const [allUsers, setAllUsers] = useState<Profile[]>([]);
@@ -113,14 +114,7 @@ const Settings = () => {
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="text-foreground hover:bg-accent rounded-xl"
-            >
-              <ArrowLeft size={22} />
-            </Button>
+            <BackButton className="text-foreground hover:bg-accent rounded-xl" />
             <h1 className="text-xl font-bold text-foreground">Settings</h1>
           </div>
         </div>

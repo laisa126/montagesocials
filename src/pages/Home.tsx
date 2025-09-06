@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { getPosts, likePost, unlikePost, getAllProfiles, getStories, savePost, unsavePost, getSavedPosts } from "@/lib/supabase";
+import { getPosts, likePost, unlikePost, getAllProfiles, getStories, savePost, unsavePost, getSavedPostIds } from "@/lib/supabase";
 import { Profile, Post, Story } from "@/lib/supabase";
 import ImageCarousel from "@/components/ImageCarousel";
 import { VerificationBadge } from "@/components/ui/verification-badge";
@@ -29,25 +29,24 @@ const Home = () => {
   const { user, profile } = useAuth();
 
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
+    if (!user) return;
     
     const loadData = async () => {
       try {
-        setLoading(true);
-        const [postsData, profilesData, storiesData, savedData] = await Promise.all([
+        // Don't show loading screen for subsequent loads
+        if (posts.length === 0) setLoading(true);
+        
+        const [postsData, profilesData, storiesData, savedPostIds] = await Promise.all([
           getPosts(),
-          getAllProfiles(),
+          getAllProfiles(), 
           getStories(),
-          getSavedPosts().catch(() => [])
+          getSavedPostIds().catch(() => [])
         ]);
         
         setPosts(postsData);
         setProfiles(profilesData);
         setStories(storiesData);
-        setSavedPostIds(savedData.map(sp => sp.post_id));
+        setSavedPostIds(savedPostIds);
       } catch (error) {
         console.error('Error loading data:', error);
         toast({
@@ -61,7 +60,7 @@ const Home = () => {
     };
     
     loadData();
-  }, [user, navigate, toast]);
+  }, [user, toast, posts.length]);
 
   const getProfileById = (userId: string) => {
     return profiles.find(profile => profile.user_id === userId);
@@ -163,17 +162,17 @@ const Home = () => {
     
     setRefreshing(true);
     try {
-      const [postsData, profilesData, storiesData, savedData] = await Promise.all([
+      const [postsData, profilesData, storiesData, savedPostIds] = await Promise.all([
         getPosts(),
-        getAllProfiles(), 
+        getAllProfiles(),
         getStories(),
-        getSavedPosts().catch(() => [])
+        getSavedPostIds().catch(() => [])
       ]);
       
       setPosts(postsData);
       setProfiles(profilesData);
       setStories(storiesData);
-      setSavedPostIds(savedData.map(sp => sp.post_id));
+      setSavedPostIds(savedPostIds);
       
       toast({
         title: "Feed refreshed",
@@ -202,10 +201,11 @@ const Home = () => {
     return `${Math.floor(diffInMinutes / 1440)}d`;
   };
 
-  if (!user || !profile || loading) {
+  // Show minimal loading only on first load  
+  if (!user || !profile || (loading && posts.length === 0)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
       </div>
     );
   }

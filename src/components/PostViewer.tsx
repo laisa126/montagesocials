@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getPostById, likePost, unlikePost, getComments, addComment, getPostLikes, savePost, unsavePost, getSavedPosts, Post, Comment } from "@/lib/supabase";
+import { getPostById, likePost, unlikePost, getComments, addComment, getPostLikes, savePost, unsavePost, getSavedPostIds, Post, Comment } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import ImageCarousel from "@/components/ImageCarousel";
@@ -38,18 +38,18 @@ const PostViewer = () => {
 
     const loadPost = async () => {
       try {
-        const [postData, commentsData, likesData, savedData] = await Promise.all([
+        const [postData, commentsData, likesData, savedPostIds] = await Promise.all([
           getPostById(postId),
           getComments(postId),
           getPostLikes(postId),
-          getSavedPosts().catch(() => [])
+          getSavedPostIds().catch(() => [])
         ]);
 
         setPost(postData);
         setComments(commentsData);
         setLikesCount(likesData.length);
         setIsLiked(likesData.some(like => like.user_id === currentUser.id));
-        setIsSaved(savedData.some(sp => sp.post_id === postId));
+        setIsSaved(savedPostIds.includes(postId));
       } catch (error) {
         console.error('Error loading post:', error);
         toast({

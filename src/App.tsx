@@ -5,7 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
+import { NavigationProvider } from "./hooks/useNavigation";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
@@ -45,6 +47,7 @@ const AppLayout = () => {
   return (
     <>
       <Routes>
+        <Route path="/index" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
@@ -85,7 +88,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <AppLayout />
+          <NavigationProvider>
+            <AppLayout />
+          </NavigationProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
