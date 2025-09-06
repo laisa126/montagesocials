@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { useNavigate } from "react-router-dom";
 import { 
   getPosts, 
@@ -185,9 +186,7 @@ const Explore = () => {
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-foreground">{user.username}</p>
                           {user.is_verified && (
-                            <Badge variant="secondary" className="bg-primary text-primary-foreground h-4 w-4 p-0 rounded-full flex items-center justify-center text-xs">
-                              ✓
-                            </Badge>
+                            <VerificationBadge size={16} />
                           )}
                         </div>
                         {user.full_name && (

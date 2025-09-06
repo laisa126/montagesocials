@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { GradientButton } from "@/components/ui/button-variants";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -152,9 +153,7 @@ const UserProfile = () => {
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-semibold text-foreground">{profileUser.username}</h1>
               {profileUser.is_verified && (
-                <Badge variant="secondary" className="bg-primary text-primary-foreground h-5 w-5 p-0 rounded-full flex items-center justify-center">
-                  ✓
-                </Badge>
+                <VerificationBadge size={20} />
               )}
             </div>
           </div>
@@ -187,9 +186,7 @@ const UserProfile = () => {
           <div className="flex items-center justify-center gap-2">
             <h1 className="text-2xl font-bold text-foreground font-inter">{profileUser.username}</h1>
             {profileUser.is_verified && (
-              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground text-sm font-bold">✓</span>
-              </div>
+              <VerificationBadge size={16} />
             )}
           </div>
           {profileUser.full_name && (

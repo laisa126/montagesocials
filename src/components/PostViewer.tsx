@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Share } from "lucide-react";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -241,7 +242,7 @@ const PostViewer = () => {
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-foreground">{post.profiles?.username}</h3>
                 {post.profiles?.is_verified && (
-                  <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                  <VerificationBadge size={16} />
                 )}
               </div>
               <p className="text-xs text-muted-foreground">{formatTime(post.created_at)}</p>

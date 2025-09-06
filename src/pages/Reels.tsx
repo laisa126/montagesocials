@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { getPosts, likePost, unlikePost, getAllProfiles, Post, Profile } from "@/lib/supabase";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 
 const Reels = () => {
   const [reels, setReels] = useState<Post[]>([]);
@@ -152,9 +153,7 @@ const Reels = () => {
                       <div className="text-left">
                         <p className="font-semibold text-white text-sm">{reelUser.username}</p>
                         {reelUser.is_verified && (
-                          <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center ml-1">
-                            <span className="text-primary-foreground text-[10px]">✓</span>
-                          </div>
+                          <VerificationBadge size={16} />
                         )}
                       </div>
                     </button>

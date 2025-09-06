@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { GradientButton } from "@/components/ui/button-variants";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -201,9 +202,7 @@ const FollowersList = () => {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-foreground">{user.username}</h3>
                           {user.is_verified && (
-                            <Badge variant="secondary" className="bg-primary text-primary-foreground h-5 w-5 p-0 rounded-full flex items-center justify-center">
-                              ✓
-                            </Badge>
+                            <VerificationBadge size={20} />
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground truncate">{user.full_name}</p>

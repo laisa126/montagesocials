@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAllProfiles, banUser as supabaseBanUser, verifyUser as supabaseVerifyUser, Profile } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 
 const Settings = () => {
   const [allUsers, setAllUsers] = useState<Profile[]>([]);
@@ -142,7 +143,7 @@ const Settings = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-bold text-foreground text-lg">{profile.full_name || profile.username}</h3>
-                  {profile.is_verified && <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>}
+                  {profile.is_verified && <VerificationBadge size={16} />}
                   {profile.is_admin && <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-md">ADMIN</span>}
                 </div>
                 <p className="text-muted-foreground font-medium">@{profile.username}</p>
@@ -233,7 +234,7 @@ const Settings = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="font-medium text-foreground">{user.username}</p>
-                            {user.is_verified && <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>}
+                            {user.is_verified && <VerificationBadge size={12} />}
                             {user.is_admin && <span className="px-1 py-0.5 bg-red-500 text-white text-xs rounded">ADMIN</span>}
                             {user.is_banned && <span className="px-1 py-0.5 bg-red-600 text-white text-xs rounded">BANNED</span>}
                           </div>

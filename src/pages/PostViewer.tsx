@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   getCurrentUser, 
@@ -196,9 +197,7 @@ const PostViewer = () => {
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-foreground">{postUser.username}</p>
                     {postUser.isVerified && (
-                      <Badge variant="secondary" className="bg-primary text-primary-foreground h-5 w-5 p-0 rounded-full flex items-center justify-center">
-                        ✓
-                      </Badge>
+                      <VerificationBadge size={20} />
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">{formatTimeAgo(post.createdAt)}</p>
@@ -267,9 +266,7 @@ const PostViewer = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-sm text-foreground">{commentUser.username}</span>
                           {commentUser.isVerified && (
-                            <Badge variant="secondary" className="bg-primary text-primary-foreground h-4 w-4 p-0 rounded-full flex items-center justify-center text-xs">
-                              ✓
-                            </Badge>
+                            <VerificationBadge size={16} />
                           )}
                           <span className="text-xs text-muted-foreground">
                             {formatTimeAgo(comment.createdAt)}

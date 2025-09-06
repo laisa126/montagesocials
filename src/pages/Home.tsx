@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getPosts, likePost, unlikePost, getAllProfiles, getStories, savePost, unsavePost, getSavedPosts } from "@/lib/supabase";
 import { Profile, Post, Story } from "@/lib/supabase";
 import ImageCarousel from "@/components/ImageCarousel";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -377,9 +378,7 @@ const Home = () => {
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-foreground text-sm">{postProfile.username}</p>
                           {postProfile.is_verified && (
-                            <div className="w-3 h-3 bg-primary rounded-full flex items-center justify-center">
-                              <span className="text-primary-foreground text-[10px]">✓</span>
-                            </div>
+                            <VerificationBadge size={12} />
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground">{formatTimeAgo(post.created_at)}</p>

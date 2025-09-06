@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   getCurrentUser, 
@@ -200,9 +201,7 @@ const StoryViewer = () => {
             <div className="flex items-center gap-2">
               <p className="font-semibold">{storyUser.username}</p>
               {storyUser.isVerified && (
-                <Badge variant="secondary" className="bg-white/20 text-white h-5 w-5 p-0 rounded-full flex items-center justify-center">
-                  ✓
-                </Badge>
+                <VerificationBadge size={20} />
               )}
             </div>
             <p className="text-sm text-white/70">
